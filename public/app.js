@@ -356,45 +356,76 @@ function go(view,extra){
 addEventListener("resize",()=>{placeLens(false);Object.keys(segPrev).forEach(k=>delete segPrev[k]);syncSegs()});
 
 
-/* ---------- Real refraction (Chromium): an SVG displacement lens used as backdrop-filter ---------- */
+/* ---------- Real refraction (Chromium): an SVG lens used as backdrop-filter ----------
+   Bends the backdrop like thick glass, splits it into RGB the way a real lens disperses light
+   at its curved edge, and adds a directional specular highlight along that curve. */
 const lensSupported=/Chrome|Chromium|Edg\//.test(navigator.userAgent)&&!/Firefox/.test(navigator.userAgent)&&CSS.supports("backdrop-filter","url(#x)");
 const svgNS="http://www.w3.org/2000/svg";
 const lensDefs=(()=>{const svg=document.createElementNS(svgNS,"svg");svg.setAttribute("width","0");svg.setAttribute("height","0");svg.style.position="absolute";svg.setAttribute("aria-hidden","true");const d=document.createElementNS(svgNS,"defs");svg.appendChild(d);document.body.appendChild(svg);return d})();
-function displacementMap(w,h,r,bezel){
-  const c=document.createElement("canvas");c.width=w;c.height=h;const ctx=c.getContext("2d");const img=ctx.createImageData(w,h);
+// Two maps sharing one rounded-rect distance field: how far each pixel bends (and which way),
+// and how "tall" the glass is there — flat on top, curving down to zero right at the rim.
+function buildMaps(w,h,r,bezel){
+  const dC=document.createElement("canvas");dC.width=w;dC.height=h;const dctx=dC.getContext("2d");const dimg=dctx.createImageData(w,h);
+  const hC=document.createElement("canvas");hC.width=w;hC.height=h;const hctx=hC.getContext("2d");const himg=hctx.createImageData(w,h);
   const hx=w/2,hy=h/2;
   const sdf=(x,y)=>{const qx=Math.abs(x-hx)-(hx-r),qy=Math.abs(y-hy)-(hy-r);return Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-r};
+  const smooth=t=>t*t*(3-2*t);
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){
     const px=x+.5,py=y+.5,d=-sdf(px,py),i=(y*w+x)*4;
-    let dx=0,dy=0;
-    if(d>0&&d<bezel){
-      const gx=sdf(px+1,py)-sdf(px-1,py),gy=sdf(px,py+1)-sdf(px,py-1),gl=Math.hypot(gx,gy)||1;
-      const t=1-d/bezel, m=t*t*(3-2*t);           // smooth falloff from the rim inward
-      dx=-(gx/gl)*m; dy=-(gy/gl)*m;               // sample inward: edges magnify and bend like a thick lens
+    let dx=0,dy=0,height=0;
+    if(d>0){
+      height=d>=bezel?1:smooth(d/bezel);
+      if(d<bezel){
+        const gx=sdf(px+1,py)-sdf(px-1,py),gy=sdf(px,py+1)-sdf(px,py-1),gl=Math.hypot(gx,gy)||1;
+        const m=smooth(1-d/bezel);                // strongest right at the rim, fading to 0 inward
+        dx=-(gx/gl)*m; dy=-(gy/gl)*m;              // sample inward: the rim magnifies and bends like a thick lens
+      }
     }
-    img.data[i]=128+dx*127; img.data[i+1]=128+dy*127; img.data[i+2]=128; img.data[i+3]=255;
+    dimg.data[i]=128+dx*127; dimg.data[i+1]=128+dy*127; dimg.data[i+2]=128; dimg.data[i+3]=255;
+    himg.data[i]=255; himg.data[i+1]=255; himg.data[i+2]=255; himg.data[i+3]=Math.round(height*255);
   }
-  ctx.putImageData(img,0,0);return c.toDataURL();
+  dctx.putImageData(dimg,0,0); hctx.putImageData(himg,0,0);
+  return {disp:dC.toDataURL(),height:hC.toDataURL()};
 }
+const chan={r:"1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0",g:"0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0",b:"0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"};
 let lensN=0;
-function refract(el,{bezel=24,scale=72,blur=0.8,sat=1.8}={}){
+function refract(el,{bezel=24,scale=76,blur=0.7,sat=1.85,disperse=0.16,spec=0.7,shine=20,azimuth=235,elevation=52}={}){
   if(!lensSupported||!el) return;
   const w=Math.round(el.offsetWidth),h=Math.round(el.offsetHeight); if(!w||!h) return;
   const r=Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius)||0,h/2,w/2);
+  const bez=Math.min(bezel,h/2,w/2);
   const id=el.dataset.lensId||("lg"+(++lensN)); el.dataset.lensId=id;
   let f=document.getElementById(id); if(f) f.remove();
+  const {disp,height}=buildMaps(w,h,r,bez);
   f=document.createElementNS(svgNS,"filter");
   f.setAttribute("id",id);f.setAttribute("x","0");f.setAttribute("y","0");f.setAttribute("width",w);f.setAttribute("height",h);
   f.setAttribute("filterUnits","userSpaceOnUse");f.setAttribute("primitiveUnits","userSpaceOnUse");f.setAttribute("color-interpolation-filters","sRGB");
-  f.innerHTML=`<feImage href="${displacementMap(w,h,r,Math.min(bezel,h/2))}" x="0" y="0" width="${w}" height="${h}" result="map"/>
+  const sR=(scale*(1-disperse)).toFixed(1), sG=scale.toFixed(1), sB=(scale*(1+disperse)).toFixed(1);
+  f.innerHTML=`
+    <feImage href="${disp}" x="0" y="0" width="${w}" height="${h}" result="map"/>
+    <feImage href="${height}" x="0" y="0" width="${w}" height="${h}" result="hmap"/>
     <feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" result="soft"/>
-    <feDisplacementMap in="soft" in2="map" scale="${scale}" xChannelSelector="R" yChannelSelector="G" result="bent"/>
-    <feColorMatrix in="bent" type="saturate" values="${sat}"/>`;
+    <feDisplacementMap in="soft" in2="map" scale="${sR}" xChannelSelector="R" yChannelSelector="G" result="bentR"/>
+    <feDisplacementMap in="soft" in2="map" scale="${sG}" xChannelSelector="R" yChannelSelector="G" result="bentG"/>
+    <feDisplacementMap in="soft" in2="map" scale="${sB}" xChannelSelector="R" yChannelSelector="G" result="bentB"/>
+    <feColorMatrix in="bentR" type="matrix" values="${chan.r}" result="rC"/>
+    <feColorMatrix in="bentG" type="matrix" values="${chan.g}" result="gC"/>
+    <feColorMatrix in="bentB" type="matrix" values="${chan.b}" result="bC"/>
+    <feBlend in="rC" in2="gC" mode="screen" result="rg"/>
+    <feBlend in="rg" in2="bC" mode="screen" result="body"/>
+    <feColorMatrix in="body" type="saturate" values="${sat}" result="sat"/>
+    <feSpecularLighting in="hmap" surfaceScale="${(bez*0.4).toFixed(1)}" specularConstant="${spec}" specularExponent="${shine}" lighting-color="#ffffff" result="specRaw">
+      <feDistantLight azimuth="${azimuth}" elevation="${elevation}"/>
+    </feSpecularLighting>
+    <feBlend in="sat" in2="specRaw" mode="screen"/>`;
   lensDefs.appendChild(f);
   el.style.backdropFilter=`url(#${id})`; el.style.webkitBackdropFilter=`url(#${id})`;
   el.classList.add("refract");
 }
-function refractAll(){refract(document.querySelector(".tabs"));refract(document.querySelector(".fab"),{bezel:26,scale:60})}
+function refractAll(){
+  refract(document.querySelector(".tabs"),{bezel:30,scale:96,disperse:.22,spec:.85,shine:15});
+  refract(document.querySelector(".fab"),{bezel:30,scale:104,disperse:.28,spec:1.1,shine:13});
+}
 addEventListener("resize",()=>{clearTimeout(refractAll.t);refractAll.t=setTimeout(refractAll,150)});
 
 

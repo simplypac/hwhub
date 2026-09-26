@@ -25,7 +25,7 @@
   --shadow:0 1px 3px rgba(0,0,0,.04);
   --g-bg:rgba(255,255,255,.16); --g-bg-frost:rgba(255,255,255,.42); --g-bg-strong:rgba(250,250,252,.72); --g-rim:rgba(255,255,255,.95); --g-rim2:rgba(255,255,255,.25);
   --g-shadow:0 10px 30px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06); --g-lens:rgba(255,255,255,.28); --g-hi:rgba(255,255,255,.75);
-  --amb1:rgba(0,122,255,.10); --amb2:rgba(175,82,222,.08); --amb3:rgba(255,149,0,.07);
+  --amb1:rgba(0,122,255,.24); --amb2:rgba(175,82,222,.20); --amb3:rgba(255,149,0,.18); --amb4:rgba(255,45,110,.20);
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -40,7 +40,7 @@
     --glass:rgba(28,28,30,.78); --sheet:#1C1C1E; --handle:#48484A;
     --shadow:none; --g-bg:rgba(40,40,44,.14); --g-bg-frost:rgba(44,44,48,.46); --g-bg-strong:rgba(30,30,33,.72); --g-rim:rgba(255,255,255,.28); --g-rim2:rgba(255,255,255,.05);
     --g-shadow:0 10px 30px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3); --g-lens:rgba(255,255,255,.10); --g-hi:rgba(255,255,255,.18);
-    --amb1:rgba(10,132,255,.16); --amb2:rgba(191,90,242,.12); --amb3:rgba(255,159,10,.08);
+    --amb1:rgba(10,132,255,.42); --amb2:rgba(191,90,242,.34); --amb3:rgba(255,159,10,.26); --amb4:rgba(255,55,120,.30);
     color-scheme:dark;
   }
 }
@@ -52,7 +52,7 @@
   --glass:rgba(28,28,30,.78); --sheet:#1C1C1E; --handle:#48484A;
    --shadow:none; --g-bg:rgba(40,40,44,.14); --g-bg-frost:rgba(44,44,48,.46); --g-bg-strong:rgba(30,30,33,.72); --g-rim:rgba(255,255,255,.28); --g-rim2:rgba(255,255,255,.05);
     --g-shadow:0 10px 30px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3); --g-lens:rgba(255,255,255,.10); --g-hi:rgba(255,255,255,.18);
-    --amb1:rgba(10,132,255,.16); --amb2:rgba(191,90,242,.12); --amb3:rgba(255,159,10,.08);
+    --amb1:rgba(10,132,255,.42); --amb2:rgba(191,90,242,.34); --amb3:rgba(255,159,10,.26); --amb4:rgba(255,55,120,.30);
     color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -66,11 +66,11 @@ button{cursor:pointer;border:0;background:none;padding:0}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
 .wrap{max-width:600px;margin:0 auto;padding:0 16px 140px;position:relative;z-index:1}
 body::before{content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
-  background:radial-gradient(40% 30% at 15% 20%,var(--amb1),transparent 70%),radial-gradient(35% 30% at 90% 45%,var(--amb2),transparent 70%),radial-gradient(40% 30% at 30% 95%,var(--amb3),transparent 70%)}
+  background:radial-gradient(48% 36% at 15% 15%,var(--amb1),transparent 72%),radial-gradient(42% 38% at 92% 38%,var(--amb2),transparent 72%),radial-gradient(55% 42% at 20% 98%,var(--amb3),transparent 70%),radial-gradient(60% 46% at 85% 100%,var(--amb4),transparent 70%)}
 
 /* ---- Liquid Glass material ---- */
 .glass{position:relative;isolation:isolate;background:var(--g-bg-frost);
-  backdrop-filter:blur(14px) saturate(190%) brightness(1.04);-webkit-backdrop-filter:blur(14px) saturate(190%) brightness(1.04);
+  backdrop-filter:blur(22px) saturate(240%) brightness(1.12);-webkit-backdrop-filter:blur(22px) saturate(240%) brightness(1.12);
   box-shadow:var(--g-shadow),inset 0 1px 1px var(--g-hi),inset 0 -1px 1px var(--g-rim2)}
 .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
   background:linear-gradient(140deg,var(--g-rim) 0%,var(--g-rim2) 32%,transparent 50%,var(--g-rim2) 68%,var(--g-rim) 100%);
@@ -78,6 +78,8 @@ body::before{content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
 .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
   background:radial-gradient(120% 70% at 50% -20%,var(--g-hi),transparent 55%)}
 .glass.refract{background:var(--g-bg)}
+/* A thin two-colour fringe right at the rim, like real glass splitting light at its curved edge. */
+.glass.refract::before{background:linear-gradient(140deg,var(--g-rim) 0%,rgba(120,180,255,.55) 18%,transparent 40%,transparent 60%,rgba(255,170,140,.5) 82%,var(--g-rim) 100%)}
 .tab{text-shadow:0 0 6px var(--bg),0 0 14px var(--bg)}
 .press{transition:transform .35s cubic-bezier(.3,1.6,.4,1)}
 .press:active{transform:scale(.92)}
@@ -121,7 +123,13 @@ h1{margin:2px 0 0;font-size:34px;line-height:41px;font-weight:700;letter-spacing
 .seg button{flex:1;height:32px;border-radius:999px;font-size:13px;font-weight:500;letter-spacing:-.08px;color:var(--text);position:relative;z-index:1;transition:font-weight .2s}
 .seg button[aria-pressed="true"]{font-weight:600}
 .seg-thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:var(--g-lens);
+  backdrop-filter:blur(9px) saturate(2.1) brightness(1.16);-webkit-backdrop-filter:blur(9px) saturate(2.1) brightness(1.16);
   box-shadow:0 3px 10px rgba(0,0,0,.10),inset 0 0 0 .5px var(--g-rim),inset 0 1px 1px var(--g-hi);transform-origin:center;will-change:transform,width}
+.seg-thumb::before,.lens::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(95% 150% at 26% -35%,var(--g-hi),transparent 65%)}
+.seg-thumb::after,.lens::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;
+  background:linear-gradient(125deg,rgba(120,180,255,.85) 0%,var(--g-rim) 24%,transparent 45%,transparent 58%,var(--g-rim) 78%,rgba(255,140,110,.8) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 
 /* sections + rows */
 .sec-head{display:flex;justify-content:space-between;align-items:baseline;margin:24px 16px 6px;font-size:13px;line-height:18px;color:var(--text2);letter-spacing:-.08px}
@@ -187,7 +195,7 @@ h1{margin:2px 0 0;font-size:34px;line-height:41px;font-weight:700;letter-spacing
 .tab svg{transition:transform .35s cubic-bezier(.3,1.6,.4,1)}
 .tab[aria-current="page"]{color:var(--blue)}
 .tab:active svg{transform:scale(.88)}
-.lens{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:28px;z-index:0;background:var(--g-lens);backdrop-filter:blur(2px) brightness(1.08) saturate(1.4);-webkit-backdrop-filter:blur(2px) brightness(1.08);
+.lens{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:28px;z-index:0;background:var(--g-lens);backdrop-filter:blur(8px) brightness(1.14) saturate(2);-webkit-backdrop-filter:blur(8px) brightness(1.14) saturate(2);
   box-shadow:inset 0 0 0 .5px var(--g-rim),inset 0 1px 2px var(--g-hi),0 2px 10px rgba(0,0,0,.08);will-change:transform,width;
   transition:scale .3s cubic-bezier(.3,1.6,.4,1),box-shadow .3s}
 .lens.lift{scale:1.14 1.18;box-shadow:inset 0 0 0 1px var(--g-rim),inset 0 2px 6px var(--g-hi),0 10px 28px rgba(0,0,0,.18)}
