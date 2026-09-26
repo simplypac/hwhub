@@ -65,8 +65,6 @@ button,input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 button{cursor:pointer;border:0;background:none;padding:0}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
 .wrap{max-width:600px;margin:0 auto;padding:0 16px 140px;position:relative;z-index:1}
-body::before{content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
-  background:radial-gradient(48% 36% at 15% 15%,var(--amb1),transparent 72%),radial-gradient(42% 38% at 92% 38%,var(--amb2),transparent 72%),radial-gradient(55% 42% at 20% 98%,var(--amb3),transparent 70%),radial-gradient(60% 46% at 85% 100%,var(--amb4),transparent 70%)}
 
 /* ---- Liquid Glass material ---- */
 .glass{position:relative;isolation:isolate;background:var(--g-bg-frost);
@@ -119,7 +117,7 @@ h1{margin:2px 0 0;font-size:34px;line-height:41px;font-weight:700;letter-spacing
 .chip[aria-pressed="true"]{background:var(--text);color:var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.18)}
 .chip .n{color:var(--text3);font-weight:500;font-variant-numeric:tabular-nums}
 .chip[aria-pressed="true"] .n{color:inherit;opacity:.7}
-.seg{display:flex;position:relative;border-radius:999px;padding:3px;margin-top:12px}
+.seg{display:flex;position:relative;border-radius:999px;padding:3px;margin-top:12px;overflow:hidden}
 .seg button{flex:1;height:32px;border-radius:999px;font-size:13px;font-weight:500;letter-spacing:-.08px;color:var(--text);position:relative;z-index:1;transition:font-weight .2s}
 .seg button[aria-pressed="true"]{font-weight:600}
 .seg-thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:var(--g-lens);

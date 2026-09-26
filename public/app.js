@@ -302,6 +302,7 @@ function placeLens(animate){
   const btn=document.querySelector(`.tab[data-view="${state.view}"]`); if(!btn) return;
   const to=slotOf(btn,tabsIn);
   liquidMove(lens,animate?lensPos:null,to); lensPos=to;
+  refract(lens,{bezel:11,scale:42,disperse:.22,spec:1,shine:13,sat:2,w:to.w});
 }
 // Segmented controls
 const segPrev={};
@@ -310,6 +311,7 @@ function syncSegs(root=document){
     const thumb=seg.querySelector(".seg-thumb"), btn=seg.querySelector('button[aria-pressed="true"]'); if(!thumb||!btn) return;
     const to=slotOf(btn,seg), key=seg.dataset.key;
     liquidMove(thumb,segPrev[key],to,{dur:480}); segPrev[key]=to;
+    refract(thumb,{bezel:10,scale:38,disperse:.22,spec:1,shine:13,sat:2,w:to.w});
   });
 }
 // Page change: old content melts out, new content condenses in.
@@ -389,9 +391,9 @@ function buildMaps(w,h,r,bezel){
 }
 const chan={r:"1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0",g:"0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0",b:"0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"};
 let lensN=0;
-function refract(el,{bezel=24,scale=76,blur=0.7,sat=1.85,disperse=0.16,spec=0.7,shine=20,azimuth=235,elevation=52}={}){
+function refract(el,{bezel=24,scale=76,blur=0.7,sat=1.85,disperse=0.16,spec=0.7,shine=20,azimuth=235,elevation=52,w:wOverride}={}){
   if(!lensSupported||!el) return;
-  const w=Math.round(el.offsetWidth),h=Math.round(el.offsetHeight); if(!w||!h) return;
+  const w=Math.round(wOverride??el.offsetWidth),h=Math.round(el.offsetHeight); if(!w||!h) return;
   const r=Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius)||0,h/2,w/2);
   const bez=Math.min(bezel,h/2,w/2);
   const id=el.dataset.lensId||("lg"+(++lensN)); el.dataset.lensId=id;
