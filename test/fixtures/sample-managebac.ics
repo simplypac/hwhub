@@ -1,0 +1,66 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Made-up sample for tests (not a real ManageBac export)//EN
+X-WR-CALNAME:ManageBac
+BEGIN:VTIMEZONE
+TZID:Europe/Istanbul
+BEGIN:STANDARD
+TZOFFSETFROM:+0300
+TZOFFSETTO:+0300
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:task-1001@managebac
+SUMMARY:DP Economics HL: IA Commentary 1 Draft [Summative]
+DTSTART;TZID=Europe/Istanbul:20260929T235900
+DTEND;TZID=Europe/Istanbul:20260929T235900
+URL:https://school.managebac.com/student/classes/111/core_tasks/1001
+DESCRIPTION:<p>Write your first commentary draft.</p><ul><li>Max 800 words
+ </li><li>Upload as PDF to Turnitin</li><li>Use at least 2 diagrams</li></ul>
+END:VEVENT
+BEGIN:VEVENT
+UID:task-1002@managebac
+SUMMARY:Biology SL - Topic 3.2 practice questions
+DTSTART:20260926T180000Z
+URL:https://school.managebac.com/student/classes/222/core_tasks/1002
+DESCRIPTION:Complete all 12 questions on Kognity.
+END:VEVENT
+BEGIN:VEVENT
+UID:task-1003@managebac
+SUMMARY:TOK Exhibition: object selection
+DTSTART;VALUE=DATE:20261002
+CATEGORIES:Theory of Knowledge
+END:VEVENT
+BEGIN:VEVENT
+UID:event-2001@managebac
+SUMMARY:Parent-Teacher Conferences
+DTSTART;TZID=Europe/Istanbul:20261001T150000
+DTEND;TZID=Europe/Istanbul:20261001T190000
+END:VEVENT
+BEGIN:VEVENT
+UID:event-2002@managebac
+SUMMARY:Math AA HL
+DTSTART;TZID=Europe/Istanbul:20260928T083000
+DTEND;TZID=Europe/Istanbul:20260928T095000
+RRULE:FREQ=WEEKLY;BYDAY=MO,WE
+LOCATION:Room 204
+END:VEVENT
+BEGIN:VEVENT
+UID:event-2003@managebac
+SUMMARY:Republic Day Holiday
+DTSTART;VALUE=DATE:20261029
+END:VEVENT
+BEGIN:VEVENT
+UID:task-1004@managebac
+SUMMARY:Physics HL Lab Report\, pendulum
+DTSTART;TZID=Europe/Istanbul:20261005T170000
+URL:https://school.managebac.com/student/classes/333/core_tasks/1004
+DESCRIPTION:Max 3 pages. Include uncertainty analysis.
+BEGIN:VALARM
+TRIGGER:-PT1H
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+END:VCALENDAR

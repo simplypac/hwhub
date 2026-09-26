@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root{--bg:#F2F2F7;--card:#fff;--text:#1A1B1F;--text2:#6C6C72;--blue:#007AFF;--red:#FF3B30;--green:#34C759;--sep:rgba(60,60,67,.18);color-scheme:light dark}
+  @media (prefers-color-scheme:dark){:root{--bg:#1C1C1E;--card:#2C2C2E;--text:#F2F2F7;--text2:#AEAEB2;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--sep:rgba(84,84,88,.6)}}
+  *{box-sizing:border-box} body{margin:0;width:320px;background:var(--bg);color:var(--text);font:15px/20px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px}
+  h1{font-size:17px;margin:0 0 2px;display:flex;align-items:center;gap:8px} h1 img{width:22px;height:22px;border-radius:6px}
+  .sub{color:var(--text2);font-size:13px;margin:0 0 14px}
+  .field{background:var(--card);border-radius:12px;overflow:hidden;margin-bottom:10px}
+  .field label{display:block;padding:8px 12px 0;font-size:12px;color:var(--text2)}
+  .field input{width:100%;border:0;background:transparent;color:inherit;font:inherit;padding:2px 12px 9px;outline:none}
+  .field div+div{border-top:.5px solid var(--sep)}
+  button{width:100%;height:42px;border:0;border-radius:11px;font:600 15px/1 inherit;font-family:inherit;cursor:pointer;background:var(--blue);color:#fff}
+  button.link{background:none;color:var(--blue);height:auto;margin-top:12px;font-weight:500;font-size:13px}
+  button[disabled]{opacity:.55}
+  .msg{margin-top:12px;font-size:13px;color:var(--text2)} .msg.err{color:var(--red)} .msg.ok{color:var(--green)}
+  ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--text2)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+  <h1><img src="icon-128.png" alt="">Homework Hub</h1>
+  <p class="sub" id="who">Send this page's assignments to your list.</p>
+
+  <section id="setup" hidden>
+    <div class="field">
+      <div><label for="server">App address</label><input id="server" placeholder="https://your-hub.example.com" spellcheck="false"></div>
+      <div><label for="key">Extension key</label><input id="key" placeholder="hh_…" spellcheck="false"></div>
+    </div>
+    <button id="save">Connect</button>
+    <p class="msg">Find both in the app: Settings → Browser extension.</p>
+  </section>
+
+  <section id="main" hidden>
+    <button id="send">Add assignments from this page</button>
+    <div class="msg" id="out">Open your assignments or to-do page first, then click.</div>
+    <button class="link" id="change">Change app address or key</button>
+  </section>
+  <script src="popup.js"></script>
+</body>
+</html>
